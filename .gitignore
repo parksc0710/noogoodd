@@ -36,4 +36,4 @@ out/
 ### VS Code ###
 .vscode/
 
-application-jpa.properties
+**/src/main/resources/application-jpa.properties
