@@ -22,7 +22,7 @@ public class UserService implements GetUserUseCase, SetUserUserCase {
         Optional<UserEntity> userEntity = userRepository.findByUuid(uuid);
         if (userEntity.isPresent()) {
             UserEntity entity = userEntity.get();
-            return new UserDto(entity.getId(), entity.getUuid(), entity.getName(), entity.getEmail());
+            return new UserDto(entity.getId(), entity.getUuid(), entity.getName(), entity.getEmail(), entity.getGender(), entity.isAct_flg(), entity.getReg_dt(), entity.getChg_dt());
         } else {
             throw new RuntimeException("User not found");
         }
@@ -30,10 +30,10 @@ public class UserService implements GetUserUseCase, SetUserUserCase {
 
     @Override
     public UserDto registerUser(UserDto userDto) {
-        User user = new User(userDto.getId(), userDto.getUuid(), userDto.getName(), userDto.getEmail());
-        UserEntity userEntity = new UserEntity(user.getId(), user.getUuid(), user.getName(), user.getEmail());
+        User user = new User(userDto.getId(), userDto.getUuid(), userDto.getName(), userDto.getEmail(), userDto.getGender(), userDto.isAct_flg(), userDto.getReg_dt(), userDto.getChg_dt());
+        UserEntity userEntity = new UserEntity(user.getId(), user.getUuid(), user.getName(), user.getEmail(), user.getGender(), user.isAct_flg(), user.getReg_dt(), user.getChg_dt());
         UserEntity savedUser = userRepository.save(userEntity);
-        return new UserDto(savedUser.getId(), savedUser.getUuid(), savedUser.getName(), savedUser.getEmail());
+        return new UserDto(savedUser.getId(), savedUser.getUuid(), savedUser.getName(), savedUser.getEmail(), savedUser.getGender(), savedUser.isAct_flg(), savedUser.getReg_dt(), savedUser.getChg_dt());
     }
 
     @Override
@@ -43,8 +43,10 @@ public class UserService implements GetUserUseCase, SetUserUserCase {
             UserEntity userEntity = userEntityOptional.get();
             userEntity.setName(afterDto.getName());
             userEntity.setEmail(afterDto.getEmail());
+            userEntity.setGender(afterDto.getGender());
+            userEntity.setAct_flg(afterDto.isAct_flg());
             UserEntity updatedUser = userRepository.save(userEntity);
-            return new UserDto(updatedUser.getId(), updatedUser.getUuid(), updatedUser.getName(), updatedUser.getEmail());
+            return new UserDto(updatedUser.getId(), updatedUser.getUuid(), updatedUser.getName(), updatedUser.getEmail(), updatedUser.getGender(), updatedUser.isAct_flg(), updatedUser.getReg_dt(), updatedUser.getChg_dt());
         } else {
             throw new RuntimeException("User not found");
         }
