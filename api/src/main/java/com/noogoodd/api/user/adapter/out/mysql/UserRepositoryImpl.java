@@ -26,6 +26,6 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<UserEntity> findByUuid(String uuid) {
-        return jpaUserRepository.findByUuid(uuid);
+        return jpaUserRepository.findActiveUserByUuid(uuid);
     }
 }

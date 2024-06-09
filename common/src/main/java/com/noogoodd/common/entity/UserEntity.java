@@ -8,6 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -15,6 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "user")
 public class UserEntity {
 
@@ -30,5 +36,16 @@ public class UserEntity {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    private String gender;
+
+    private boolean act_flg;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime reg_dt;
+
+    @LastModifiedDate
+    private LocalDateTime chg_dt;
 
 }
