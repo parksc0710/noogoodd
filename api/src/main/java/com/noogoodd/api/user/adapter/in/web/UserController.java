@@ -7,7 +7,8 @@ import com.noogoodd.api.user.application.port.in.SetUserUserCase;
 import com.noogoodd.api.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,55 +29,51 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/get")
-    public UserDto getUser(HttpServletRequest request) throws Exception {
-        final String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new Exception("Invalid token");
+    public ResponseEntity<?> getUser(HttpServletRequest request) {
+        Long userIdFromToken;
+        try {
+            userIdFromToken = jwtUtil.checkJWTToken(request);
+        } catch(Exception e) {
+            return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
 
-        String jwt = authorizationHeader.substring(7);
-        Long userIdFromToken = jwtUtil.extractUserId(jwt);
-
-        return getUserUseCase.getUserById(userIdFromToken);
+        return ResponseEntity.ok(getUserUseCase.getUserById(userIdFromToken));
     }
 
     @PostMapping("/register")
-    public UserDto registerUser(@RequestBody UserDto userDto) {
-        return setUserUseCase.registerUser(userDto);
+    public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
+        return ResponseEntity.ok(setUserUseCase.registerUser(userDto));
     }
 
     @PostMapping("/update")
-    public UserDto updateUser(HttpServletRequest request, @RequestBody UserDto userDto) throws Exception {
-        final String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new Exception("Invalid token");
+    public ResponseEntity<?> updateUser(HttpServletRequest request, @RequestBody UserDto userDto) {
+        Long userIdFromToken;
+        try {
+            userIdFromToken = jwtUtil.checkJWTToken(request);
+        } catch(Exception e) {
+            return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
 
-        String jwt = authorizationHeader.substring(7);
-        Long userIdFromToken = jwtUtil.extractUserId(jwt);
-
-        return setUserUseCase.updateUser(userIdFromToken, userDto);
+        return ResponseEntity.ok(setUserUseCase.updateUser(userIdFromToken, userDto));
     }
 
     @PostMapping("/login")
-    public String createAuthenticationToken(@RequestBody LoginAuthenticationRequest authenticationRequest) throws Exception {
+    public ResponseEntity<String> createAuthenticationToken(@RequestBody LoginAuthenticationRequest authenticationRequest) {
         UserDto user;
         try {
             user = getUserUseCase.getUserByUsername(authenticationRequest.getUsername());
             if (user == null) {
-                throw new BadCredentialsException("Invalid username");
+                return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
             }
             if (!passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword())) {
-                throw new BadCredentialsException("Invalid password");
+                return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
             }
-        } catch (BadCredentialsException e) {
-            throw new Exception("Incorrect username or password");
         } catch (Exception e) {
-            throw new Exception("Exception occured during authentication");
+            return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
-        return jwtUtil.generateToken(user.getId(), userDetails);
+        return ResponseEntity.ok(jwtUtil.generateToken(user.getId(), userDetails));
     }
 }

@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -68,5 +69,15 @@ public class JwtUtil {
 
     public Long extractUserId(String token) {
         return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+
+    public Long checkJWTToken(HttpServletRequest request) throws Exception{
+        final String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new Exception();
+        }
+
+        String jwt = authorizationHeader.substring(7);
+        return this.extractUserId(jwt);
     }
 }
