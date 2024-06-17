@@ -8,6 +8,7 @@ import com.noogoodd.api.user.domain.User;
 import com.noogoodd.common.entity.UserEntity;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,11 @@ public class UserService implements GetUserUseCase, SetUserUserCase {
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    @Override
+    public UserDetails getUserDetailsByUsername(String username) {
+        return userRepository.loadUserByUsername(username);
     }
 
     @Override

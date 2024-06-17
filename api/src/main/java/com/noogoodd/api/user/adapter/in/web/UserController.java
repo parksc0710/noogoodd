@@ -25,7 +25,6 @@ public class UserController {
     private final GetUserUseCase getUserUseCase;
     private final SetUserUserCase setUserUseCase;
     private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/get")
@@ -72,7 +71,7 @@ public class UserController {
             return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final UserDetails userDetails = getUserUseCase.getUserDetailsByUsername(authenticationRequest.getUsername());
 
         return ResponseEntity.ok(jwtUtil.generateToken(user.getId(), userDetails));
     }

@@ -43,7 +43,7 @@ public class UserRepositoryImpl implements UserRepository {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UserEntity> user = jpaUserRepository.findActiveUserByUsername(username);
         User.UserBuilder builder;
-        if(user.isPresent()) {
+        if (user.isPresent()) {
             UserEntity userEntity = user.get();
             builder = User.withUsername(username);
             builder.password(userEntity.getPassword());
