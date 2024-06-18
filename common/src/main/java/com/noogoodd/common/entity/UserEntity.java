@@ -28,24 +28,32 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String uuid;
-
-    @Column(unique = true)
-    private String username;
+    @Column(nullable = false)
+    private String email;
 
     private String password;
 
     @Column(nullable = false)
     private String role;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(unique = true)
+    private String uuid;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column(nullable = false)
+    private String nickname;
+
+    private String disability_type;
+
+    private String aid_type;
+
+    private String address_area;
 
     private String gender;
+
+    private String birth_day;
+
+    @Column(nullable = false)
+    private String sign_type;
 
     private boolean act_flg;
 

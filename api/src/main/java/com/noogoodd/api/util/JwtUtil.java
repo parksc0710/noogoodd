@@ -1,5 +1,7 @@
 package com.noogoodd.api.util;
 
+import com.noogoodd.api.user.application.dto.UserDto;
+import com.noogoodd.api.user.domain.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,10 +21,6 @@ public class JwtUtil {
 
     private final Key secret = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private final Long expiration = 3600000L;
-
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -45,11 +43,13 @@ public class JwtUtil {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public String generateToken(Long userId, UserDetails userDetails) {
+    public String generateToken(Long userId, User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
-        claims.put("roles", userDetails.getAuthorities());
-        return createToken(claims, userDetails.getUsername());
+        claims.put("userEmail", user.getEmail());
+        claims.put("userType", user.getSign_type());
+        claims.put("roles", user.getAuthorities());
+        return createToken(claims, String.valueOf(userId));
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
@@ -62,13 +62,21 @@ public class JwtUtil {
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public Boolean validateToken(String token, User user) {
+        final Long userId = extractUserId(token);
+        return (userId.equals(user.getId()) && !isTokenExpired(token));
     }
 
     public Long extractUserId(String token) {
         return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+
+    public String extractUserEmail(String token) {
+        return extractClaim(token, claims -> claims.get("userEmail", String.class));
+    }
+
+    public String extractUserType(String token) {
+        return extractClaim(token, claims -> claims.get("userType", String.class));
     }
 
     public Long checkJWTToken(HttpServletRequest request) throws Exception{

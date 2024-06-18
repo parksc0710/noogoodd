@@ -22,7 +22,7 @@ public class SNSLoginController {
     @PostMapping("/{provider}")
     public SNSLoginResponse login(@PathVariable String provider, @RequestBody SNSLoginRequest request) {
         User user = oAuth2UserService.login(provider, request.getToken());
-        return new SNSLoginResponse(user.getUuid(), user.getName(), user.getEmail());
+        return new SNSLoginResponse(user.getUuid(), user.getEmail(), user.getSign_type());
     }
 
 }

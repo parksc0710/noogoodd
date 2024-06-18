@@ -11,6 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SNSLoginResponse {
     private String uuid;
-    private String name;
     private String email;
+    private String type;
 }

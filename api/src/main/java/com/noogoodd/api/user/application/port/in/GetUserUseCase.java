@@ -1,11 +1,10 @@
 package com.noogoodd.api.user.application.port.in;
 
 import com.noogoodd.api.user.application.dto.UserDto;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.noogoodd.api.user.domain.User;
 
 public interface GetUserUseCase {
     UserDto getUserById(Long id);
-    UserDto getUserByUUID(String uuid);
-    UserDto getUserByUsername(String username);
-    UserDetails getUserDetailsByUsername(String username);
+    UserDto getUserByUserEmail(String email, String type);
+    User getUserServiceByUserEmail(String email, String type);
 }

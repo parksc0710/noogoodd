@@ -4,13 +4,12 @@ import com.noogoodd.api.user.adapter.in.model.LoginAuthenticationRequest;
 import com.noogoodd.api.user.application.dto.UserDto;
 import com.noogoodd.api.user.application.port.in.GetUserUseCase;
 import com.noogoodd.api.user.application.port.in.SetUserUserCase;
+import com.noogoodd.api.user.domain.User;
 import com.noogoodd.api.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,20 +58,22 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> createAuthenticationToken(@RequestBody LoginAuthenticationRequest authenticationRequest) {
         UserDto user;
+        String userEmail = authenticationRequest.getEmail();
+        String userType = authenticationRequest.getType();
         try {
-            user = getUserUseCase.getUserByUsername(authenticationRequest.getUsername());
+            user = getUserUseCase.getUserByUserEmail(userEmail, userType);
             if (user == null) {
                 return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
             }
-            if (!passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword())) {
+            if(userType.equals("NORMAL") && !passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword())) {
                 return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
 
-        final UserDetails userDetails = getUserUseCase.getUserDetailsByUsername(authenticationRequest.getUsername());
+        final User userDomain = getUserUseCase.getUserServiceByUserEmail(userEmail, userType);
 
-        return ResponseEntity.ok(jwtUtil.generateToken(user.getId(), userDetails));
+        return ResponseEntity.ok(jwtUtil.generateToken(user.getId(), userDomain));
     }
 }

@@ -2,6 +2,7 @@ package com.noogoodd.api.filter;
 
 import com.noogoodd.api.user.application.dto.UserDto;
 import com.noogoodd.api.user.application.service.UserService;
+import com.noogoodd.api.user.domain.User;
 import com.noogoodd.api.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -45,35 +46,32 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         final String authorizationHeader = request.getHeader("Authorization");
 
-        String username = null;
+        Long userId = null;
+        String userEmail = "";
+        String userTpye = "";
         String jwt = null;
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
-            username = jwtUtil.extractUsername(jwt);
+            userId = jwtUtil.extractUserId(jwt);
+            userEmail = jwtUtil.extractUserEmail(jwt);
+            userTpye = jwtUtil.extractUserType(jwt);
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDto userDto = userService.getUserByUsername(username);
-
-            UserDetails userDetails = org.springframework.security.core.userdetails.User
-                    .withUsername(userDto.getUsername())
-                    .password(userDto.getPassword())
-                    .authorities(List.of(new SimpleGrantedAuthority(userDto.getRole())))
-                    .build();
+            User userDetails = userService.getUserServiceByUserEmail(userEmail, userTpye);
 
             if (jwtUtil.validateToken(jwt, userDetails)) {
-                Long userId = jwtUtil.extractUserId(jwt);
-                if (!userDto.getId().equals(userId)) {
+                if (!userDetails.getId().equals(userId)) {
                     throw new ServletException("User ID in token does not match the authenticated user");
                 }
 
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
             }
         }
         chain.doFilter(request, response);
