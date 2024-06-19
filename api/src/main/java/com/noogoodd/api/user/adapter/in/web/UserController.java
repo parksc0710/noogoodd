@@ -56,7 +56,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> createAuthenticationToken(@RequestBody LoginAuthenticationRequest authenticationRequest) {
+    public ResponseEntity<String> createAuthenticationToken(@RequestBody LoginAuthenticationRequest authenticationRequest) throws Exception {
         UserDto user;
         String userEmail = authenticationRequest.getEmail();
         String userType = authenticationRequest.getType();
