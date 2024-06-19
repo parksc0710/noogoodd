@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "user")
+@Table(name = "[user]")
 public class UserEntity {
 
     @Id
@@ -42,6 +42,8 @@ public class UserEntity {
     @Column(nullable = false)
     private String nickname;
 
+    private boolean disability_yn;
+    
     private String disability_type;
 
     private String aid_type;

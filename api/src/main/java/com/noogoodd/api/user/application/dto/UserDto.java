@@ -19,6 +19,7 @@ public class UserDto {
     private String role;
     private String uuid;
     private String nickname;
+    private boolean disability_yn;
     private String disability_type;
     private String aid_type;
     private String address_area;
