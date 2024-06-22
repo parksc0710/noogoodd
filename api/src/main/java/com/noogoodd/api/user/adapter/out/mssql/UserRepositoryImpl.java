@@ -1,4 +1,4 @@
-package com.noogoodd.api.user.adapter.out.mysql;
+package com.noogoodd.api.user.adapter.out.mssql;
 
 import com.noogoodd.api.user.adapter.out.jpa.JpaUserRepository;
 import com.noogoodd.api.user.application.port.out.UserRepository;

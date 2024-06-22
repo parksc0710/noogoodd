@@ -1,4 +1,4 @@
-package com.noogoodd.api.home.adapter.out.mysql;
+package com.noogoodd.api.home.adapter.out.mssql;
 
 import com.noogoodd.api.home.adapter.out.jpa.JpaHomeRepository;
 import com.noogoodd.api.home.application.port.out.HomeRepository;

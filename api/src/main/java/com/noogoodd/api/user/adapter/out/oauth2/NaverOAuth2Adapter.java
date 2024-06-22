@@ -16,8 +16,8 @@ public class NaverOAuth2Adapter implements OAuth2UseCase {
     }
 
     @Override
-    public User getUserInfo(String accessToken) {
+    public String getUserInfo(String accessToken) {
         // Call Naver API to get user info
-        return new User();
+        return "";
     }
 }

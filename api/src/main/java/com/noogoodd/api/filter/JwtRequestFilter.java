@@ -27,7 +27,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final List<AntPathRequestMatcher> excludeUrlPatterns = List.of(
             new AntPathRequestMatcher("/user/register"),
-            new AntPathRequestMatcher("/user/login")
+            new AntPathRequestMatcher("/user/login"),
+            new AntPathRequestMatcher("/sns-login/**")
     );
 
     @Override
